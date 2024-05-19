@@ -1,17 +1,9 @@
-
-
-
-
-
-
-
 const lerp = (a, b, n) => (1 - n) * a + n * b;
 
 class Cursor {
   constructor() {
-    // config
-    this.target = { x: 0.5, y: 0.5 }; // mouse position
-    this.cursor = { x: 0.5, y: 0.5 }; // cursor position
+    this.target = { x: 0.5, y: 0.5 }; 
+    this.cursor = { x: 0.5, y: 0.5 }; 
     this.speed = 1;
     this.init();
   }
@@ -19,29 +11,24 @@ class Cursor {
     ["onMouseMove", "render"].forEach((fn) => (this[fn] = this[fn].bind(this)));
   }
   onMouseMove(e) {
-    //get normalized mouse coordinates [0, 1]
     this.target.x = e.clientX / window.innerWidth;
     this.target.y = e.clientY / window.innerHeight;
-    // trigger loop if no loop is active
     if (!this.raf) this.raf = requestAnimationFrame(this.render);
   }
   render() {
-    //calculate lerped values
     this.cursor.x = lerp(this.cursor.x, this.target.x, this.speed);
     this.cursor.y = lerp(this.cursor.y, this.target.y, this.speed);
     document.documentElement.style.setProperty("--cursor-x", this.cursor.x);
     document.documentElement.style.setProperty("--cursor-y", this.cursor.y);
-    //cancel loop if mouse stops moving
     const delta = Math.sqrt(
       Math.pow(this.target.x - this.cursor.x, 2) +
-      Math.pow(this.target.y - this.cursor.y, 2)
+        Math.pow(this.target.y - this.cursor.y, 2)
     );
     if (delta < 0.001) {
       cancelAnimationFrame(this.raf);
       this.raf = null;
       return;
     }
-    //or continue looping if mouse is moving
     this.raf = requestAnimationFrame(this.render);
   }
   init() {
@@ -53,71 +40,53 @@ class Cursor {
 
 new Cursor();
 
-
-document.addEventListener('DOMContentLoaded', function(){
-
-
-  const swiper = new Swiper('.swiper', {
+document.addEventListener("DOMContentLoaded", function () {
+  const swiper = new Swiper(".swiper", {
     slidesPerView: 1,
     spaceBetween: 20,
     centeredSlides: false,
-    loop:true,
+    loop: true,
     autoplayDisableOnInteraction: false,
-    // autoplay: {
-    //   delay: 3000,
-    // },
+    autoplay: {
+      delay: 3000,
+    },
     breakpoints: {
       600: {
-        slidesPerView: 'auto',
-    spaceBetween: 24,
-     
+        slidesPerView: "auto",
+        spaceBetween: 24,
+      },
     },
-    
-    }
-    
-
   });
-
-
-
-
 
   const fullHD = document.documentElement.clientWidth;
-  const tickers = document.querySelectorAll('.lenta__content');
+  const tickers = document.querySelectorAll(".lenta__content");
 
-  tickers.forEach(ticker => {
+  tickers.forEach((ticker) => {
+    let tickerStyle = window.getComputedStyle(ticker);
 
+    let maxWidth = tickerStyle.getPropertyValue("max-width");
+    if (maxWidth.endsWith("px")) {
+      maxWidth = parseInt(maxWidth);
+    } else {
+      maxWidth = fullHD + 2;
+    }
+    let mark = ticker.querySelector(".lenta__list");
+    markWidth = mark.getBoundingClientRect().width;
+    markWidth1 = mark.clientWidth;
+    console.log(maxWidth + "test");
 
-      let tickerStyle = window.getComputedStyle(ticker);
-     
-      let maxWidth = tickerStyle.getPropertyValue('max-width');
-      if ( maxWidth.endsWith('px') ) { maxWidth = parseInt(maxWidth); } else { maxWidth = ( fullHD + 2 ); }
-      let mark = ticker.querySelector('.lenta__list');
-      markWidth = mark.getBoundingClientRect().width;
-      markWidth1 = mark.clientWidth;
-    console.log(maxWidth + 'test') ;
-
-    console.log(markWidth1) ;
+    console.log(markWidth1);
     // if ( ( markWidth > 0 ) && markWidth   ){
-      
-      if (  markWidth > 0 ) {
-        
-                  let markInnerHTML = mark.innerHTML;
-                  while ( markWidth < maxWidth ){
-                    console.log(maxWidth);
-                          mark.innerHTML += markInnerHTML;
-                          markWidth = markWidth + markWidth;
-                  }
-                  mark.parentElement.appendChild( mark.cloneNode(true) );
-                  ticker.classList.add('on');
+
+    if (markWidth > 0) {
+      let markInnerHTML = mark.innerHTML;
+      while (markWidth < maxWidth) {
+        console.log(maxWidth);
+        mark.innerHTML += markInnerHTML;
+        markWidth = markWidth + markWidth;
       }
+      mark.parentElement.appendChild(mark.cloneNode(true));
+      ticker.classList.add("on");
+    }
   });
 });
-
-
-
-
-
-
-
-
